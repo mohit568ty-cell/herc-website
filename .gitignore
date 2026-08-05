@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+
+backend/node_modules/
+herc-site/node_modules/
+
+backend/dist/
+herc-site/dist/
+
+*.log
