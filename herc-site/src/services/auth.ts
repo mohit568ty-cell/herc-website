@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+
+const API_URL =
+  import.meta.env.VITE_API_URL ?? "http://localhost:5000/api";
 
 export interface LoginData {
   email: string;
@@ -16,7 +18,7 @@ export interface LoginResponse {
 
 class AuthService {
   async login(data: LoginData): Promise<LoginResponse> {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+    const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +44,7 @@ class AuthService {
     localStorage.removeItem("herc_user");
   }
 
-  getToken() {
+  getToken(): string | null {
     return localStorage.getItem("herc_token");
   }
 
@@ -52,7 +54,7 @@ class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
-  isAuthenticated() {
+  isAuthenticated(): boolean {
     return !!this.getToken();
   }
 }
