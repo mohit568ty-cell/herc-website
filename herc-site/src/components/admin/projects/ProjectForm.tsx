@@ -58,21 +58,19 @@ export function ProjectForm({
     });
   }
 
-
   async function uploadImage() {
-  if (!imageFile) return form.imageUrl;
+    if (!imageFile) return form.imageUrl;
 
-  const data = new FormData();
-  data.append("image", imageFile);
+    const data = new FormData();
+    data.append("image", imageFile);
 
-  const response = await api<{ url: string }>("/upload/image", {
-    method: "POST",
-    body: data,
-  });
+    const response = await api<{ url: string }>("/upload/image", {
+      method: "POST",
+      body: data,
+    });
 
-  return response.url;
-}
-
+    return response.url;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -83,7 +81,6 @@ export function ProjectForm({
       ...form,
       imageUrl: uploadedImageUrl,
     };
-
 
     if (selectedProject) {
       updateProject.mutate(
@@ -114,14 +111,11 @@ export function ProjectForm({
     }
   }
 
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-
       <h2 className="text-xl font-semibold">
         {selectedProject ? "Edit Project" : "Add Project"}
       </h2>
-
 
       <input
         name="title"
@@ -131,7 +125,6 @@ export function ProjectForm({
         className="w-full rounded border p-2"
       />
 
-
       <input
         name="slug"
         value={form.slug}
@@ -140,7 +133,6 @@ export function ProjectForm({
         className="w-full rounded border p-2"
       />
 
-
       <textarea
         name="description"
         value={form.description}
@@ -148,7 +140,6 @@ export function ProjectForm({
         placeholder="Description"
         className="w-full rounded border p-2"
       />
-
 
       <div>
         <label className="mb-2 block text-sm font-medium">
@@ -167,12 +158,11 @@ export function ProjectForm({
         {form.imageUrl && (
           <img
             src={form.imageUrl}
-            alt="Preview"
+            alt="Project preview"
             className="mt-3 h-32 rounded object-cover"
           />
         )}
       </div>
-
 
       <select
         name="status"
@@ -184,7 +174,6 @@ export function ProjectForm({
         <option value="Ongoing">Ongoing</option>
         <option value="Upcoming">Upcoming</option>
       </select>
-
 
       <button
         type="submit"
@@ -201,7 +190,6 @@ export function ProjectForm({
           ? "Update Project"
           : "Save Project"}
       </button>
-
     </form>
   );
 }
