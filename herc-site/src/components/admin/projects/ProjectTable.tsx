@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProjects } from "@/hooks/useProject";
+import { useProjects } from "@/hooks/useProjects";
 import { useDeleteProject } from "@/hooks/useDeleteProject";
 
 interface ProjectTableProps {
