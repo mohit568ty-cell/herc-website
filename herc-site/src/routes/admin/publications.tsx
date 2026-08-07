@@ -9,20 +9,24 @@ export const Route = createFileRoute("/admin/publications")({
 
 function AdminPublicationsPage() {
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold tracking-tight">
           Publications Management
         </h1>
 
-        <p className="text-muted-foreground">
+        <p className="mt-2 text-muted-foreground">
           Manage publications for the HERC website.
         </p>
       </div>
 
-      <PublicationForm />
+      <section className="rounded-xl border bg-card p-6 shadow-sm">
+        <PublicationForm />
+      </section>
 
-      <PublicationTable />
+      <section className="rounded-xl border bg-card p-6 shadow-sm">
+        <PublicationTable />
+      </section>
     </div>
   );
 }

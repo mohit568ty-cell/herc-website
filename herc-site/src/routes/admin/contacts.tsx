@@ -28,7 +28,7 @@ function ContactsPage() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold tracking-tight">
             Contact Messages
           </h1>
 
@@ -38,8 +38,13 @@ function ContactsPage() {
         </div>
 
         {isLoading && (
-          <div className="rounded-lg border p-8 text-center">
-            Loading contacts...
+          <div className="space-y-3">
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                className="h-16 rounded-lg border bg-muted/40 animate-pulse"
+              />
+            ))}
           </div>
         )}
 

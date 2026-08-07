@@ -33,12 +33,43 @@ function Dashboard() {
   const { user, logout } = useAuth();
   const { data, isLoading } = useAdminStats();
 
-  return (
-    <div className="min-h-screen bg-background">
+  const stats = [
+    {
+      title: "Projects",
+      value: data?.projects ?? 0,
+      icon: <FolderKanban size={28} />,
+      link: "/admin/projects",
+    },
+    {
+      title: "Publications",
+      value: data?.publications ?? 0,
+      icon: <FileText size={28} />,
+      link: "/admin/publications",
+    },
+    {
+      title: "Gallery",
+      value: data?.galleryImages ?? 0,
+      icon: <Image size={28} />,
+      link: "/admin/gallery",
+    },
+    {
+      title: "Research Domains",
+      value: data?.researchDomains ?? 0,
+      icon: <Leaf size={28} />,
+      link: "/admin/research",
+    },
+    {
+      title: "Contacts",
+      value: data?.contactMessages ?? 0,
+      icon: <Mail size={28} />,
+      link: "/admin/contacts",
+    },
+  ];
 
+  return (
+    <div>
       <header className="border-b bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between p-6">
-
           <div>
             <h1 className="text-3xl font-bold">
               HERC Admin
@@ -48,7 +79,6 @@ function Dashboard() {
               Welcome, {user?.email}
             </p>
           </div>
-
 
           <button
             onClick={logout}
@@ -60,21 +90,18 @@ function Dashboard() {
               text-white
               transition
               hover:bg-red-700
+              active:scale-95
             "
           >
             Logout
           </button>
-
         </div>
       </header>
 
-
       <main className="mx-auto max-w-7xl p-6">
-
         <h2 className="mb-6 text-2xl font-semibold">
           Dashboard Overview
         </h2>
-
 
         <div
           className="
@@ -84,70 +111,21 @@ function Dashboard() {
             lg:grid-cols-3
           "
         >
-
-          <StatsCard
-            title="Projects"
-            value={
-              isLoading
-                ? "..."
-                : data?.projects ?? 0
-            }
-            icon={<FolderKanban size={28} />}
-            link="/admin/projects"
-          />
-
-
-          <StatsCard
-            title="Publications"
-            value={
-              isLoading
-                ? "..."
-                : data?.publications ?? 0
-            }
-            icon={<FileText size={28} />}
-            link="/admin/publications"
-          />
-
-
-          <StatsCard
-            title="Gallery"
-            value={
-              isLoading
-                ? "..."
-                : data?.galleryImages ?? 0
-            }
-            icon={<Image size={28} />}
-            link="/admin/gallery"
-          />
-
-
-          <StatsCard
-            title="Research Domains"
-            value={
-              isLoading
-                ? "..."
-                : data?.researchDomains ?? 0
-            }
-            icon={<Leaf size={28} />}
-            link="/admin/research"
-          />
-
-
-          <StatsCard
-            title="Contacts"
-            value={
-              isLoading
-                ? "..."
-                : data?.contactMessages ?? 0
-            }
-            icon={<Mail size={28} />}
-            link="/admin/contacts"
-          />
-
+          {stats.map((item) => (
+            <StatsCard
+              key={item.title}
+              title={item.title}
+              value={
+                isLoading
+                  ? "..."
+                  : item.value
+              }
+              icon={item.icon}
+              link={item.link}
+            />
+          ))}
         </div>
-
       </main>
-
     </div>
   );
 }

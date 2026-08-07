@@ -32,12 +32,10 @@ function LoginPage() {
       setLoading(true);
       setError("");
 
-      const response = await authService.login({
+      await authService.login({
         email,
         password,
       });
-
-      console.log("LOGIN SUCCESS:", response);
 
       navigate({
         to: "/admin",
@@ -52,17 +50,33 @@ function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-950 via-green-900 to-black px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md space-y-5 rounded-xl border bg-white p-8 shadow"
+        className="
+          w-full
+          max-w-md
+          space-y-5
+          rounded-2xl
+          border
+          bg-white/95
+          p-8
+          shadow-2xl
+          backdrop-blur
+        "
       >
-        <h1 className="text-3xl font-bold">
-          HERC Admin Login
-        </h1>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-green-900">
+            HERC Admin Login
+          </h1>
+
+          <p className="mt-2 text-sm text-muted-foreground">
+            Secure management portal
+          </p>
+        </div>
 
         {error && (
-          <div className="rounded-lg bg-red-100 p-3 text-red-600">
+          <div className="rounded-lg bg-red-100 p-3 text-sm text-red-600">
             {error}
           </div>
         )}
@@ -70,7 +84,17 @@ function LoginPage() {
         <input
           type="email"
           placeholder="Admin Email"
-          className="w-full rounded-lg border p-3"
+          className="
+            w-full
+            rounded-lg
+            border
+            p-3
+            outline-none
+            transition
+            focus:border-green-700
+            focus:ring-2
+            focus:ring-green-200
+          "
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -79,7 +103,17 @@ function LoginPage() {
         <input
           type="password"
           placeholder="Password"
-          className="w-full rounded-lg border p-3"
+          className="
+            w-full
+            rounded-lg
+            border
+            p-3
+            outline-none
+            transition
+            focus:border-green-700
+            focus:ring-2
+            focus:ring-green-200
+          "
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -88,9 +122,20 @@ function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-green-700 p-3 text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="
+            w-full
+            rounded-lg
+            bg-green-700
+            p-3
+            font-medium
+            text-white
+            transition
+            hover:bg-green-800
+            active:scale-95
+            disabled:opacity-50
+          "
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Authenticating..." : "Login"}
         </button>
       </form>
     </div>

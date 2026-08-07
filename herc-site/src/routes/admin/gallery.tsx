@@ -9,9 +9,9 @@ export const Route = createFileRoute("/admin/gallery")({
 
 function AdminGalleryPage() {
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold tracking-tight">
           Gallery Management
         </h1>
 
@@ -20,9 +20,13 @@ function AdminGalleryPage() {
         </p>
       </div>
 
-      <GalleryForm />
+      <section className="rounded-xl border bg-card p-6">
+        <GalleryForm />
+      </section>
 
-      <GalleryTable />
+      <section className="rounded-xl border bg-card p-6">
+        <GalleryTable />
+      </section>
     </div>
   );
 }
