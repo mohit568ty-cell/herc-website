@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { GalleryImage } from "@/types/gallery";
 
-
 export function useGallery() {
   return useQuery({
     queryKey: ["gallery"],
@@ -15,9 +14,15 @@ export function useGallery() {
 
       return res.data;
     },
+
+    // Performance optimization
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+
+    // Avoid unnecessary refetch when switching tabs
+    refetchOnWindowFocus: false,
   });
 }
-
 
 export function useCreateGalleryImage() {
   const queryClient = useQueryClient();
@@ -47,7 +52,6 @@ export function useCreateGalleryImage() {
     },
   });
 }
-
 
 export function useDeleteGalleryImage() {
   const queryClient = useQueryClient();

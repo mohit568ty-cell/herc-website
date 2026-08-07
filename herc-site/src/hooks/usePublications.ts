@@ -15,6 +15,13 @@ export function usePublications() {
   return useQuery({
     queryKey: ["publications"],
     queryFn: fetchPublications,
+
+    // Performance optimization
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+
+    // Avoid unnecessary refetch
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -23,6 +30,7 @@ export function useCreatePublication() {
 
   return useMutation({
     mutationFn: createPublication,
+
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["publications"],

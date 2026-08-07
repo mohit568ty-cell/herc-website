@@ -11,7 +11,18 @@ export function useResearchDomains() {
   return useQuery<ResearchDomain[], Error>({
     queryKey: researchDomainsQueryKey,
     queryFn: fetchResearchDomains,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+
+    // Keep data fresh for 5 minutes
+    staleTime: 5 * 60 * 1000,
+
+    // Keep cached data for smoother navigation
+    gcTime: 10 * 60 * 1000,
+
+    // Avoid unnecessary API calls
+    refetchOnWindowFocus: false,
+
+    // Less aggressive retry
     retry: 1,
+    retryDelay: 1000,
   });
 }

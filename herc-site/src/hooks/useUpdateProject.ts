@@ -10,7 +10,7 @@ export function useUpdateProject() {
       data,
     }: {
       id: string;
-      data: any;
+      data: Parameters<typeof updateProject>[1];
     }) => updateProject(id, data),
 
     onSuccess: () => {

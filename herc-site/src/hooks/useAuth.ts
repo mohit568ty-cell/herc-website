@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import authService from "@/services/auth";
 
 export function useAuth() {
-  const [user, setUser] = useState(authService.getUser());
+  const [user, setUser] = useState(() => authService.getUser());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +20,6 @@ export function useAuth() {
     user,
     loading,
     logout,
-    isAuthenticated: authService.isAuthenticated(),
+    isAuthenticated: Boolean(user),
   };
 }

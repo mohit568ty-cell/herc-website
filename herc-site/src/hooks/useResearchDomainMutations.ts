@@ -8,7 +8,6 @@ import {
 
 import { researchDomainsQueryKey } from "./useResearchDomains";
 
-
 export function useCreateResearchDomain() {
   const queryClient = useQueryClient();
 
@@ -23,8 +22,6 @@ export function useCreateResearchDomain() {
   });
 }
 
-
-
 export function useDeleteResearchDomain() {
   const queryClient = useQueryClient();
 
@@ -38,8 +35,6 @@ export function useDeleteResearchDomain() {
     },
   });
 }
-
-
 
 export function useUpdateResearchDomain() {
   const queryClient = useQueryClient();
@@ -56,8 +51,7 @@ export function useUpdateResearchDomain() {
         description: string;
         imageUrl?: string;
       };
-    }) =>
-      updateResearchDomain(id, data),
+    }) => updateResearchDomain(id, data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

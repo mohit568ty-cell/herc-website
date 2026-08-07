@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchProjectBySlug } from "@/api/projects";
+import { fetchProjects } from "@/api/projects";
 
-export function useProject(slug: string) {
+export function useProjects() {
   return useQuery({
-    queryKey: ["project", slug],
-    queryFn: () => fetchProjectBySlug(slug),
-    enabled: Boolean(slug),
+    queryKey: ["projects"],
+    queryFn: fetchProjects,
+
+    // Performance optimization
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+
+    // Avoid refetch every time page/tab focus changes
+    refetchOnWindowFocus: false,
   });
 }
