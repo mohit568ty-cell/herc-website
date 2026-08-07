@@ -32,8 +32,7 @@ function HomePage() {
         <GalleryMasonry />
         <CallToAction />
       </main>
-      <SiteFooter />
-      <FloatingContact />
+      
     </div>
   );
 }
