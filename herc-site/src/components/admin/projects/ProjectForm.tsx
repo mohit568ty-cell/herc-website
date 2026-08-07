@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useCreateProject } from "@/hooks/useCreateProject";
 import { useUpdateProject } from "@/hooks/useUpdateProject";
-import { Project, projects } from "@/lib/projects-data";
+import { api } from "@/lib/api";
+
 interface ProjectFormProps {
   selectedProject?: any;
   onDone?: () => void;
@@ -13,6 +14,8 @@ export function ProjectForm({
 }: ProjectFormProps) {
   const createProject = useCreateProject();
   const updateProject = useUpdateProject();
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -40,6 +43,8 @@ export function ProjectForm({
         imageUrl: "",
       });
     }
+
+    setImageFile(null);
   }, [selectedProject]);
 
   function handleChange(
@@ -53,14 +58,38 @@ export function ProjectForm({
     });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+
+  async function uploadImage() {
+  if (!imageFile) return form.imageUrl;
+
+  const data = new FormData();
+  data.append("image", imageFile);
+
+  const response = await api<{ url: string }>("/upload/image", {
+    method: "POST",
+    body: data,
+  });
+
+  return response.url;
+}
+
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const uploadedImageUrl = await uploadImage();
+
+    const projectData = {
+      ...form,
+      imageUrl: uploadedImageUrl,
+    };
+
 
     if (selectedProject) {
       updateProject.mutate(
         {
           id: selectedProject.id,
-          data: form,
+          data: projectData,
         },
         {
           onSuccess: () => {
@@ -69,7 +98,7 @@ export function ProjectForm({
         }
       );
     } else {
-      createProject.mutate(form, {
+      createProject.mutate(projectData, {
         onSuccess: () => {
           setForm({
             title: "",
@@ -78,23 +107,21 @@ export function ProjectForm({
             status: "Completed",
             imageUrl: "",
           });
+
+          setImageFile(null);
         },
       });
     }
   }
 
-  function onEdit(projects: Project[]) {
-    throw new Error("Function not implemented.");
-  }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded border p-6"
-    >
+    <form onSubmit={handleSubmit} className="space-y-4">
+
       <h2 className="text-xl font-semibold">
         {selectedProject ? "Edit Project" : "Add Project"}
       </h2>
+
 
       <input
         name="title"
@@ -104,6 +131,7 @@ export function ProjectForm({
         className="w-full rounded border p-2"
       />
 
+
       <input
         name="slug"
         value={form.slug}
@@ -111,6 +139,7 @@ export function ProjectForm({
         placeholder="project-slug"
         className="w-full rounded border p-2"
       />
+
 
       <textarea
         name="description"
@@ -120,13 +149,30 @@ export function ProjectForm({
         className="w-full rounded border p-2"
       />
 
-      <input
-        name="imageUrl"
-        value={form.imageUrl}
-        onChange={handleChange}
-        placeholder="Image URL"
-        className="w-full rounded border p-2"
-      />
+
+      <div>
+        <label className="mb-2 block text-sm font-medium">
+          Project Image
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) =>
+            setImageFile(e.target.files?.[0] || null)
+          }
+          className="w-full rounded border p-2"
+        />
+
+        {form.imageUrl && (
+          <img
+            src={form.imageUrl}
+            alt="Preview"
+            className="mt-3 h-32 rounded object-cover"
+          />
+        )}
+      </div>
+
 
       <select
         name="status"
@@ -139,39 +185,23 @@ export function ProjectForm({
         <option value="Upcoming">Upcoming</option>
       </select>
 
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          className="rounded bg-black px-4 py-2 text-white"
-          disabled={
-            createProject.isPending || updateProject.isPending
-          }
-        >
-          {createProject.isPending || updateProject.isPending
-            ? "Saving..."
-            : selectedProject
-            ? "Update Project"
-            : "Save Project"}
-        </button>
-<button
-  onClick={() => {
-    console.log(projects);
-    onEdit(projects);
-  }}
-  className="rounded border px-3 py-1"
->
-  Edit
-</button>
-        {selectedProject && (
-          <button
-            type="button"
-            onClick={onDone}
-            className="rounded border px-4 py-2"
-          >
-            Cancel
-          </button>
-        )}
-      </div>
+
+      <button
+        type="submit"
+        className="rounded bg-black px-4 py-2 text-white"
+        disabled={
+          createProject.isPending ||
+          updateProject.isPending
+        }
+      >
+        {createProject.isPending ||
+        updateProject.isPending
+          ? "Saving..."
+          : selectedProject
+          ? "Update Project"
+          : "Save Project"}
+      </button>
+
     </form>
   );
 }
