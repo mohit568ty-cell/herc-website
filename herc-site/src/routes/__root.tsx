@@ -273,7 +273,7 @@ function RootLayout() {
         <Outlet />
       </main>
 
-      {!isAdminRoute && <SiteFooter />}
+      {!isAdminRoute }
 
       {!isAdminRoute && <FloatingContact />}
     </div>
