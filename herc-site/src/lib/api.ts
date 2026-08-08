@@ -1,5 +1,6 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_URL ||
+  "https://herc-api-qs5a.onrender.com/api";
 
 export async function api<T>(
   endpoint: string,
@@ -12,7 +13,8 @@ export async function api<T>(
 
   const headers = new Headers(options.headers);
 
-  // Don't force Content-Type for FormData uploads
+  // Do not set Content-Type manually for FormData.
+  // Browser automatically sets multipart/form-data boundary.
   if (!(options.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }
@@ -26,22 +28,45 @@ export async function api<T>(
     headers,
   });
 
-  // Auto logout on expired/invalid token
+  // Handle expired/invalid authentication
   if (response.status === 401) {
     if (typeof window !== "undefined") {
       localStorage.removeItem("herc_token");
       localStorage.removeItem("herc_user");
-      window.location.href = "/login";
+
+      window.location.href = "/admin/login";
     }
 
     throw new Error("Unauthorized");
   }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
+    const contentType = response.headers.get("content-type");
 
-    throw new Error(error.message || "API request failed");
+    let message = `API request failed (${response.status})`;
+
+    if (contentType?.includes("application/json")) {
+      const error = (await response.json()) as {
+        message?: string;
+      };
+
+      message = error.message || message;
+    } else {
+      const text = await response.text();
+
+      if (text) {
+        message = text.slice(0, 200);
+      }
+    }
+
+    throw new Error(message);
   }
 
-  return response.json() as Promise<T>;
+  const contentType = response.headers.get("content-type");
+
+  if (!contentType?.includes("application/json")) {
+    throw new Error("Server returned an invalid response.");
+  }
+
+  return (await response.json()) as T;
 }

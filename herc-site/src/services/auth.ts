@@ -1,6 +1,6 @@
-
 const API_URL =
-  import.meta.env.VITE_API_URL ?? "http://localhost:5000/api";
+  import.meta.env.VITE_API_URL ||
+  "https://herc-api-qs5a.onrender.com/api";
 
 export interface LoginData {
   email: string;
@@ -26,20 +26,32 @@ class AuthService {
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
+    const contentType = response.headers.get("content-type");
+
+    if (!contentType?.includes("application/json")) {
+      throw new Error(
+        `Server returned an invalid response (${response.status}).`
+      );
+    }
+
+    const result = (await response.json()) as LoginResponse & {
+      message?: string;
+    };
 
     if (!response.ok) {
       throw new Error(result.message || "Login failed");
     }
 
-    // Save JWT token and user
     localStorage.setItem("herc_token", result.token);
-    localStorage.setItem("herc_user", JSON.stringify(result.user));
+    localStorage.setItem(
+      "herc_user",
+      JSON.stringify(result.user)
+    );
 
     return result;
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem("herc_token");
     localStorage.removeItem("herc_user");
   }
@@ -48,10 +60,18 @@ class AuthService {
     return localStorage.getItem("herc_token");
   }
 
-  getUser() {
+  getUser(): LoginResponse["user"] | null {
     const user = localStorage.getItem("herc_user");
 
-    return user ? JSON.parse(user) : null;
+    if (!user) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(user) as LoginResponse["user"];
+    } catch {
+      return null;
+    }
   }
 
   isAuthenticated(): boolean {
