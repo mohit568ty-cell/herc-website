@@ -51,10 +51,9 @@ router.put(
 router.patch(
   "/:id",
   authenticate,
-  validate(projectSchema),
+  validate(projectSchema.partial()),
   updateProject
 );
-
 // Delete project
 router.delete(
   "/:id",
