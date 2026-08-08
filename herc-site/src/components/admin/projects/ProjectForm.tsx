@@ -16,6 +16,7 @@ interface Project {
   description?: string;
   status?: string;
   imageUrl?: string;
+  imagePublicId?: string;
 }
 
 interface ProjectFormProps {
@@ -29,6 +30,7 @@ interface ProjectFormData {
   description: string;
   status: string;
   imageUrl: string;
+  imagePublicId: string;
 }
 
 interface UploadResponse {
@@ -41,12 +43,18 @@ interface UploadResponse {
   };
 }
 
+interface UploadedImage {
+  imageUrl: string;
+  imagePublicId: string;
+}
+
 const initialForm: ProjectFormData = {
   title: "",
   slug: "",
   description: "",
   status: "Completed",
   imageUrl: "",
+  imagePublicId: "",
 };
 
 export function ProjectForm({
@@ -68,14 +76,21 @@ export function ProjectForm({
 
   useEffect(() => {
     if (selectedProject) {
-      const imageUrl = selectedProject.imageUrl || "";
+      const imageUrl =
+        selectedProject.imageUrl || "";
+
+      const imagePublicId =
+        selectedProject.imagePublicId || "";
 
       setForm({
         title: selectedProject.title || "",
         slug: selectedProject.slug || "",
-        description: selectedProject.description || "",
-        status: selectedProject.status || "Completed",
+        description:
+          selectedProject.description || "",
+        status:
+          selectedProject.status || "Completed",
         imageUrl,
+        imagePublicId,
       });
 
       setPreviewUrl(imageUrl);
@@ -98,7 +113,9 @@ export function ProjectForm({
 
   function handleChange(
     e: ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement |
+        HTMLTextAreaElement |
+        HTMLSelectElement
     >
   ) {
     const { name, value } = e.target;
@@ -112,7 +129,8 @@ export function ProjectForm({
   function handleImageChange(
     e: ChangeEvent<HTMLInputElement>
   ) {
-    const file = e.target.files?.[0] ?? null;
+    const file =
+      e.target.files?.[0] ?? null;
 
     setError("");
 
@@ -123,41 +141,58 @@ export function ProjectForm({
     }
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file.");
+      setError(
+        "Please select a valid image file."
+      );
       e.target.value = "";
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setError("Image size must be less than 10 MB.");
+      setError(
+        "Image size must be less than 10 MB."
+      );
       e.target.value = "";
       return;
     }
 
     setImageFile(file);
 
-    const objectUrl = URL.createObjectURL(file);
+    const objectUrl =
+      URL.createObjectURL(file);
+
     setPreviewUrl(objectUrl);
   }
 
-  async function uploadImage(): Promise<string> {
+  async function uploadImage(): Promise<UploadedImage> {
+    // No new image selected.
+    // Keep the existing image information.
     if (!imageFile) {
-      return form.imageUrl;
+      return {
+        imageUrl: form.imageUrl,
+        imagePublicId: form.imagePublicId,
+      };
     }
 
     const data = new FormData();
+
     data.append("image", imageFile);
 
-    const response = await api<UploadResponse>(
-      "/upload/image",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
+    const response =
+      await api<UploadResponse>(
+        "/upload/image",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
 
     const imageUrl =
-      response.data?.secure_url || response.data?.url;
+      response.data?.secure_url ||
+      response.data?.url;
+
+    const imagePublicId =
+      response.data?.public_id;
 
     if (!imageUrl) {
       throw new Error(
@@ -165,7 +200,16 @@ export function ProjectForm({
       );
     }
 
-    return imageUrl;
+    if (!imagePublicId) {
+      throw new Error(
+        "Image upload failed. Cloudinary public ID was not returned."
+      );
+    }
+
+    return {
+      imageUrl,
+      imagePublicId,
+    };
   }
 
   async function handleSubmit(
@@ -181,28 +225,39 @@ export function ProjectForm({
       setError("");
 
       if (!form.title.trim()) {
-        setError("Project title is required.");
+        setError(
+          "Project title is required."
+        );
         return;
       }
 
       if (!form.slug.trim()) {
-        setError("Project slug is required.");
+        setError(
+          "Project slug is required."
+        );
         return;
       }
 
       if (!form.description.trim()) {
-        setError("Project description is required.");
+        setError(
+          "Project description is required."
+        );
         return;
       }
 
-      const uploadedImageUrl = await uploadImage();
+      const uploadedImage =
+        await uploadImage();
 
       const projectData = {
         title: form.title.trim(),
         slug: form.slug.trim(),
-        description: form.description.trim(),
+        description:
+          form.description.trim(),
         status: form.status,
-        imageUrl: uploadedImageUrl,
+        imageUrl:
+          uploadedImage.imageUrl,
+        imagePublicId:
+          uploadedImage.imagePublicId,
       };
 
       if (selectedProject) {
@@ -226,21 +281,24 @@ export function ProjectForm({
           }
         );
       } else {
-        createProject.mutate(projectData, {
-          onSuccess: () => {
-            setForm(initialForm);
-            setImageFile(null);
-            setPreviewUrl("");
-            onDone?.();
-          },
-          onError: (mutationError) => {
-            setError(
-              mutationError instanceof Error
-                ? mutationError.message
-                : "Failed to create project."
-            );
-          },
-        });
+        createProject.mutate(
+          projectData,
+          {
+            onSuccess: () => {
+              setForm(initialForm);
+              setImageFile(null);
+              setPreviewUrl("");
+              onDone?.();
+            },
+            onError: (mutationError) => {
+              setError(
+                mutationError instanceof Error
+                  ? mutationError.message
+                  : "Failed to create project."
+              );
+            },
+          }
+        );
       }
     } catch (uploadError) {
       setError(
@@ -254,7 +312,7 @@ export function ProjectForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5"
+      className="space-y-6"
     >
       <div>
         <h2 className="text-xl font-semibold">
@@ -367,7 +425,8 @@ export function ProjectForm({
 
         {imageFile && (
           <p className="mt-2 text-xs text-green-700">
-            New image selected: {imageFile.name}
+            New image selected:{" "}
+            {imageFile.name}
           </p>
         )}
       </div>
