@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   getProjects,
   getProject,
@@ -15,12 +16,21 @@ import { projectSchema } from "../middleware/validation/project.validation.js";
 
 const router = Router();
 
+// ─────────────────────────────────────────────
 // Public Routes
+// ─────────────────────────────────────────────
+
 router.get("/", getProjects);
+
 router.get("/slug/:slug", getProjectBySlug);
+
 router.get("/:id", getProject);
 
+// ─────────────────────────────────────────────
 // Protected Routes
+// ─────────────────────────────────────────────
+
+// Create project
 router.post(
   "/",
   authenticate,
@@ -28,6 +38,8 @@ router.post(
   createProject
 );
 
+// Update project
+// PUT support
 router.put(
   "/:id",
   authenticate,
@@ -35,6 +47,15 @@ router.put(
   updateProject
 );
 
+// PATCH support
+router.patch(
+  "/:id",
+  authenticate,
+  validate(projectSchema),
+  updateProject
+);
+
+// Delete project
 router.delete(
   "/:id",
   authenticate,

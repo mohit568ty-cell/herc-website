@@ -1,4 +1,9 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 
 import { useCreateProject } from "@/hooks/useCreateProject";
 import { useUpdateProject } from "@/hooks/useUpdateProject";
@@ -27,7 +32,13 @@ interface ProjectFormData {
 }
 
 interface UploadResponse {
-  url: string;
+  success: boolean;
+  message: string;
+  data: {
+    secure_url: string;
+    url?: string;
+    public_id?: string;
+  };
 }
 
 const initialForm: ProjectFormData = {
@@ -49,7 +60,8 @@ export function ProjectForm({
   const [previewUrl, setPreviewUrl] = useState("");
   const [error, setError] = useState("");
 
-  const [form, setForm] = useState<ProjectFormData>(initialForm);
+  const [form, setForm] =
+    useState<ProjectFormData>(initialForm);
 
   const isSaving =
     createProject.isPending || updateProject.isPending;
@@ -144,14 +156,21 @@ export function ProjectForm({
       }
     );
 
-    if (!response.url) {
-      throw new Error("Image upload failed. No image URL returned.");
+    const imageUrl =
+      response.data?.secure_url || response.data?.url;
+
+    if (!imageUrl) {
+      throw new Error(
+        "Image upload failed. Cloudinary URL was not returned."
+      );
     }
 
-    return response.url;
+    return imageUrl;
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    e: FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
 
     if (isSaving) {
@@ -239,7 +258,9 @@ export function ProjectForm({
     >
       <div>
         <h2 className="text-xl font-semibold">
-          {selectedProject ? "Edit Project" : "Add Project"}
+          {selectedProject
+            ? "Edit Project"
+            : "Add Project"}
         </h2>
 
         <p className="mt-1 text-sm text-muted-foreground">
@@ -255,7 +276,6 @@ export function ProjectForm({
         </div>
       )}
 
-      {/* Title */}
       <div>
         <label
           htmlFor="project-title"
@@ -275,7 +295,6 @@ export function ProjectForm({
         />
       </div>
 
-      {/* Slug */}
       <div>
         <label
           htmlFor="project-slug"
@@ -295,7 +314,6 @@ export function ProjectForm({
         />
       </div>
 
-      {/* Description */}
       <div>
         <label
           htmlFor="project-description"
@@ -316,7 +334,6 @@ export function ProjectForm({
         />
       </div>
 
-      {/* Image */}
       <div>
         <label
           htmlFor="project-image"
@@ -355,7 +372,6 @@ export function ProjectForm({
         )}
       </div>
 
-      {/* Status */}
       <div>
         <label
           htmlFor="project-status"
@@ -372,13 +388,20 @@ export function ProjectForm({
           disabled={isSaving}
           className="w-full rounded-lg border p-3 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-200 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <option value="Completed">Completed</option>
-          <option value="Ongoing">Ongoing</option>
-          <option value="Upcoming">Upcoming</option>
+          <option value="Completed">
+            Completed
+          </option>
+
+          <option value="Ongoing">
+            Ongoing
+          </option>
+
+          <option value="Upcoming">
+            Upcoming
+          </option>
         </select>
       </div>
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={isSaving}
