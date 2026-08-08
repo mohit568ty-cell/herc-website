@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 
 import authService from "@/services/auth";
 import { isAuthenticated } from "@/lib/auth";
-import loginBg from "@/assets/gallery/admin-login.png";
+import loginBg from "@/assets/admin-login.png";
 
 export const Route = createFileRoute("/admin/login")({
   beforeLoad: () => {
