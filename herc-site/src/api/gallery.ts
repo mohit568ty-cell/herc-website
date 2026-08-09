@@ -3,7 +3,7 @@ import type { GalleryImage, GalleryApiResponse } from "@/types/gallery";
 
 
 export async function fetchGallery(): Promise<GalleryImage[]> {
-  const response = await api<GalleryApiResponse>("/gallery");
+ const response = await api<GalleryApiResponse>("/gallery");
 
   if (!response.success) {
     throw new Error("Failed to fetch gallery");
@@ -41,7 +41,7 @@ export const updateGalleryImage = async (
   data: Partial<CreateGalleryPayload>
 ) => {
   return api(`/gallery/${id}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },

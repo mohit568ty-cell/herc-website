@@ -1,28 +1,12 @@
 import { Router } from "express";
 
-import {
-  getAdminStats,
-  getAdminDashboard
-} from "../controllers/admin.controller.js";
+import { login } from "../controllers/auth.controller.js";
 
-import { authenticate } from "../middleware/auth.middleware.js";
-
+import { validate } from "../middleware/validation/validate.js";
+import { loginSchema } from "../middleware/validation/auth.validation.js";
 
 const router = Router();
 
-
-router.get(
-  "/stats",
-  authenticate,
-  getAdminStats
-);
-
-
-router.get(
-  "/dashboard",
-  authenticate,
-  getAdminDashboard
-);
-
+router.post("/login", validate(loginSchema), login);
 
 export default router;

@@ -1,7 +1,6 @@
 import { api } from "@/lib/api";
 import type { Project, ProjectsApiResponse } from "@/types/project";
 
-
 export async function fetchProjects(): Promise<Project[]> {
   const response = await api<ProjectsApiResponse>("/projects");
 
@@ -11,7 +10,6 @@ export async function fetchProjects(): Promise<Project[]> {
 
   return response.data;
 }
-
 
 export async function fetchProjectBySlug(
   slug: string
@@ -27,6 +25,7 @@ export async function fetchProjectBySlug(
 
   return response.data;
 }
+
 export interface CreateProjectPayload {
   title: string;
   slug: string;
@@ -40,13 +39,9 @@ export const createProject = async (
 ) => {
   return api("/projects", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
 };
-
 
 export const updateProject = async (
   id: string,
@@ -54,17 +49,11 @@ export const updateProject = async (
 ) => {
   return api(`/projects/${id}`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
 };
 
-
-export const deleteProject = async (
-  id: string
-) => {
+export const deleteProject = async (id: string) => {
   return api(`/projects/${id}`, {
     method: "DELETE",
   });

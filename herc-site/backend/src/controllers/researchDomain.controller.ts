@@ -91,7 +91,7 @@ export const createResearchDomain = async (
   req: Request,
   res: Response
 ) => {
-  console.log("BODY RECEIVED:", req.body);
+
 
   try {
     const {

@@ -1,18 +1,21 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+import prisma from "../config/prisma.js";
+
 interface JwtPayload {
   userId: string;
 }
 
 export interface AuthRequest extends Request {
   userId?: string;
+  userRole?: string;
 }
 
-export const authenticate = (
+export const authenticate = async (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authHeader = req.headers.authorization;
@@ -31,23 +34,48 @@ export const authenticate = (
       });
     }
 
-    const secret = process.env.JWT_SECRET || "supersecretkey";
+    const secret = process.env.JWT_SECRET;
 
-    console.log("========== JWT DEBUG ==========");
-    console.log("Authorization:", authHeader);
-    console.log("Token:", token);
-    console.log("Secret:", secret);
+    if (!secret) {
+      throw new Error("JWT_SECRET environment variable is required");
+    }
 
     const decoded = jwt.verify(token, secret) as JwtPayload;
 
-    console.log("Decoded:", decoded);
-    console.log("===============================");
+    if (!decoded.userId) {
+      return res.status(401).json({
+        message: "Invalid token.",
+      });
+    }
 
-    req.userId = decoded.userId;
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.userId,
+      },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        message: "User no longer exists.",
+      });
+    }
+
+    if (user.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Admin privileges required.",
+      });
+    }
+
+    req.userId = user.id;
+    req.userRole = user.role;
 
     next();
   } catch (error) {
-    console.error("JWT ERROR:", error);
+    console.error("Authentication error:", error);
 
     return res.status(401).json({
       message: "Invalid or expired token.",

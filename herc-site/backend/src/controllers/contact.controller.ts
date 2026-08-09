@@ -49,10 +49,7 @@ export const submitContact = async (
 
     return res.status(500).json({
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : String(error),
+      message: "Failed to send contact message.",
     });
   }
 };

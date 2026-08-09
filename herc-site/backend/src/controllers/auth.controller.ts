@@ -7,11 +7,15 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
+    console.log("Registration attempt:", email);
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
     if (existingUser) {
+      console.log("Registration rejected: user already exists:", email);
+
       return res.status(400).json({
         message: "User already exists",
       });
@@ -26,6 +30,8 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
+    console.log("Registration successful:", email);
+
     const token = generateToken(user.id);
 
     return res.status(201).json({
@@ -37,7 +43,7 @@ export const register = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Registration error:", error);
 
     return res.status(500).json({
       message: "Server Error",
@@ -49,29 +55,31 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    console.log("Email received:", email);
+    console.log("Login attempt:", email);
 
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
-    console.log("User found:", user);
-
     if (!user) {
-      return res.status(400).json({
+      console.log("Login failed: user not found:", email);
+
+      return res.status(401).json({
         message: "Invalid credentials",
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
-    console.log("Password match:", isMatch);
-
     if (!isMatch) {
-      return res.status(400).json({
+      console.log("Login failed: invalid credentials:", email);
+
+      return res.status(401).json({
         message: "Invalid credentials",
       });
     }
+
+    console.log("Login successful:", email);
 
     const token = generateToken(user.id);
 
@@ -84,7 +92,7 @@ export const login = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Login error:", error);
 
     return res.status(500).json({
       message: "Server Error",

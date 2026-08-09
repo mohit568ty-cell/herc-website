@@ -19,7 +19,7 @@ export const getPublications = async (
       data: publications,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get Publications Error:", error);
 
     return res.status(500).json({
       success: false,
@@ -52,7 +52,7 @@ export const getPublication = async (
       data: publication,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get Publication Error:", error);
 
     return res.status(500).json({
       success: false,
@@ -67,8 +67,6 @@ export const createPublication = async (
   res: Response
 ) => {
   try {
-    console.log("Publication Body:", req.body);
-
     const {
       title,
       authors,
@@ -93,16 +91,17 @@ export const createPublication = async (
       success: true,
       data: publication,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Publication Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message,
-      error: error,
+      message: "Server Error",
     });
   }
 };
+
+// Update publication
 export const updatePublication = async (
   req: Request,
   res: Response
@@ -135,15 +134,16 @@ export const updatePublication = async (
       success: true,
       data: publication,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Update Publication Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Server Error",
     });
   }
 };
+
 // Delete publication
 export const deletePublication = async (
   req: Request,
@@ -161,7 +161,7 @@ export const deletePublication = async (
       message: "Publication deleted successfully",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Delete Publication Error:", error);
 
     return res.status(500).json({
       success: false,

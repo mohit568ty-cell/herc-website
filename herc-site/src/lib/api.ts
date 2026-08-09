@@ -13,8 +13,8 @@ export async function api<T>(
 
   const headers = new Headers(options.headers);
 
-  // Do not set Content-Type manually for FormData.
-  // Browser automatically sets multipart/form-data boundary.
+  // Do not manually set Content-Type for FormData.
+  // The browser adds the correct multipart boundary automatically.
   if (!(options.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }
@@ -28,7 +28,7 @@ export async function api<T>(
     headers,
   });
 
-  // Handle expired/invalid authentication
+  // Handle expired/invalid authentication.
   if (response.status === 401) {
     if (typeof window !== "undefined") {
       localStorage.removeItem("herc_token");
